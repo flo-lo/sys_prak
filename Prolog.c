@@ -7,6 +7,8 @@
 #include <netdb.h>
 #include <unistd.h>
 
+//test
+
 #define PORTNUMMER 1357
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 #define BUFFR 256
