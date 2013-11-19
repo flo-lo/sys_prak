@@ -7,39 +7,46 @@
 #include <netdb.h>
 #include <unistd.h>
 
-//test
-
 #define PORTNUMMER 1357
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
-#define BUFFR 256
-#define GAMEKINDNAME "Quarto\n"
-#define VERSION "VERSION 1.0\n"
 
-extern int performConnection(int socket, char* gameID);
+
+
+char *ID; //Die modifizierte GameID die wir mit der performConnection Funktion teilen werden
+char * playerNum; // Die gewünschte Spielernummer die wir optional angeben können
+extern int performConnection(int socket);
+
 
 int main (int argc, char** argv )
 {
     char *gameID;
-    char * ID;
-    gameID = malloc(sizeof(char)*17);
     ID = malloc(sizeof(char)*30);
-    strcpy(ID,"ID  ");
+    playerNum = malloc(sizeof(char)*10);
+    gameID = malloc(sizeof(char)*20);
+    strcpy(ID,"ID  "); // Vorbereitung der GameID für performConnection
 
     // char* buffer = (char*) malloc(sizeof(char)*BUFFR); //Buffer für den Stream
 
-    //Überprüfe ob die Game-ID überhaupt die richtige Länge hat
+    //Überprüfe ob die angegebene Game-ID überhaupt die richtige Länge hat oder existiert
     if ( argc == 1 || (strlen (argv[1])) != 11)
     {
 
-        printf("Fehler: Der übergebene Parameter hat nicht die korrekte Länge");
+        printf("Fehler: Der uebergebene Parameter hat nicht die korrekte Laenge");
         return EXIT_FAILURE;
     }
     else
+
     {
+        strcpy(playerNum, "PLAYER "); //Vorbereitung der Spielernummer für performConnection
+        if (argc == 3 && strlen(argv[2]) == 1)
+        {
+            strcat(playerNum,argv[2]);
+
+        }
+
         strcpy(gameID,argv[1]);
-        gameID =strcat(ID,gameID);
-        gameID =strcat(ID, "\n");
-        printf("Game ID: %s\n",ID);
+        printf("Deine Game ID: %s\n",gameID);
+        strcat(ID,gameID);
     }
 
     // Initialisiert den für die Verbindung benötigten Socket //
@@ -50,21 +57,23 @@ int main (int argc, char** argv )
     memcpy(&(host.sin_addr),ip ->h_addr,ip ->h_length);
     host.sin_family = AF_INET;
     host.sin_port = htons(PORTNUMMER);
-    // FILE * stream = fdopen(sock, "r+b");
 
     if (connect(sock,(struct sockaddr*)&host, sizeof(host)) == 0) //Verbinde mit Server
     {
-        printf("Verbindung mit %s hergestellt!",HOSTNAME);
+        printf("\nVerbindung mit %s hergestellt!\n",HOSTNAME);
 
     }
     else
     {
-        printf("Fehler beim Verbindungsaufbau mit %s!", HOSTNAME);
+        printf("\n Fehler beim Verbindungsaufbau mit %s!\n", HOSTNAME);
         return EXIT_FAILURE;
     }
 
-    performConnection(sock, ID);  //Führe Prolog Protokoll aus
+    if ((performConnection(sock)) <0 )//Führe Prolog Protokoll aus
+        perror(" Fehler:");
 
+    free(gameID);
+//free(ID); Warum hier Buffer Overflow?
     close(sock);
     return EXIT_SUCCESS;
 }
