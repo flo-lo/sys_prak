@@ -3,7 +3,7 @@ CFLAGS=-c -Wall
 LDFLAGS=
 SOURCES=Prolog.c performConnection.c
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=sysprak
+EXECUTABLE=client
 
 all: $(SOURCES) $(EXECUTABLE)
 	
