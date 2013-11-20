@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
+//#include <errno.h> fuer bessere Fehlerbehandlung (Harun)
 
 #define PORTNUMMER 1357
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
@@ -65,9 +66,9 @@ int main (int argc, char** argv )
     }
     else
     {
-        printf("\n Fehler beim Verbindungsaufbau mit %s!\n", HOSTNAME);
-        return EXIT_FAILURE;
-    }
+        printf("\n Fehler beim Verbindungsaufbau mit %s!\n", HOSTNAME); //zur besseren Fehlerbehandlung sollte 
+        return EXIT_FAILURE;                                            //printf("ERROR: %s\n", strerror(errno));
+    }                                                                   //verwendet werden! (Harun)
 
     if ((performConnection(sock)) <0 )//Führe Prolog Protokoll aus
         perror(" Fehler:");
