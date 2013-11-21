@@ -6,7 +6,6 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
-//#include <errno.h> fuer bessere Fehlerbehandlung (Harun)
 
 #define PORTNUMMER 1357
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
@@ -66,15 +65,17 @@ int main (int argc, char** argv )
     }
     else
     {
-        printf("\n Fehler beim Verbindungsaufbau mit %s!\n", HOSTNAME); //zur besseren Fehlerbehandlung sollte 
-        return EXIT_FAILURE;                                            //printf("ERROR: %s\n", strerror(errno));
-    }                                                                   //verwendet werden! (Harun)
+
+    printf("\n Fehler beim Verbindungsaufbau mit %s!\n", HOSTNAME); //zur besseren Fehlerbehandlung sollte
+                                                                   //printf("ERROR: %s\n", strerror(errno));
+       return EXIT_FAILURE;                                       //verwendet werden! (Harun)
+
+   }
 
     if ((performConnection(sock)) <0 )//Führe Prolog Protokoll aus
         perror(" Fehler:");
 
     free(gameID);
-//free(ID); Warum hier Buffer Overflow?
-    close(sock);
+free(ID); //Warum hier Buffer Overflow?
     return EXIT_SUCCESS;
 }
