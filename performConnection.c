@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
+//#include <errno.h> fuer Fehlerbehandlung (Harun)
 #define BUFFR 256
 #define GAMEKINDNAME "Quarto"
 #define VERSION "VERSION 1.0"
@@ -55,8 +56,8 @@ int sendReplyFormatted(int sock, char* reply)
     strcpy(container,reply);
     strcat(container, "\n");
     err = send(sock,container,strlen(container),0); //Sende den Container an den Server, err für Fehlerbehandlung.
-free(container);
-    return err;
+free(container);                                    //hier ebenfalss errno benutzen (Harun)
+    return err;                                     //printf("ERROR: %s\n", strerror(errno));
 
 }
 
