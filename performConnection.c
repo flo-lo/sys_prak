@@ -88,6 +88,12 @@ int performConnection(int sock)
     int err; //Return-Wert von err für Fehlerbehandlung
 
     err = recv(sock, buffer, BUFFR-1, 0); //Empfange Server Nachrichtung und speichere sie in Buffer
+    /*
+Im Falle eines Fehlers gilt dasselbe wie schon bei der Funktion send(). 
+Außerdem kann die Funktion recv() auch 0 zurückgeben. Dies bedeutet dann, 
+dass der Verbindungspartner seine Verbindung beendet hat. 
+Ansonsten wird auch mit recv() die Anzahl der erfolgreich gelesenen Bytes zurückgeliefert.
+*/
     sscanf(buffer, "%*s%*s%*s%s", reader);
     printf("\nDie Version des Servers ist: %s\n", reader);
     if (err > 0) buffer[err]='\0'; //Markiere Ende der Übertragung mit \0
