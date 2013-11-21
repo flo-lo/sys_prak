@@ -58,9 +58,15 @@ int sendReplyFormatted(int sock, char* reply)
     err = send(sock,container,strlen(container),0); //Sende den Container an den Server, err für Fehlerbehandlung.
 free(container);                                    //hier ebenfalss errno benutzen (Harun)
     return err;                                     //printf("ERROR: %s\n", strerror(errno));
-
 }
-
+/*
+"Auch wenn kein Fehler auftritt, ist es dennoch sehr wichtig, den Rückgabewert zu überprüfen. 
+Denn bei der Netzwerkprogrammierung sind auch gewisse Grenzen (Bandbreite) vorhanden – sprich, 
+Sie können nicht unendlich viele Daten auf einmal versenden. Mit der Auswertung des Rückgabewerts 
+können bzw. müssen Sie sich selbst darum kümmern, dass der eventuelle Rest, der nicht gesendet werden konnte, 
+ebenfalls noch verschickt wird. Dies erledigen Sie, indem Sie data_len mit dem Rückgabewert von send() vergleichen. 
+Durch diese Differenz (data_len – Rückgabewert) erhalten Sie die noch nicht gesendeten Daten." - Sollte implementiert werden (Harun)
+*/
 
 
 int performConnection(int sock)
