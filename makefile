@@ -14,5 +14,5 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 	
 clean:
-	rm $(EXECUTABLE) $(OBJECTS)
+	rm $(EXECUTABLE) $(OBJECTS) log.txt
 
