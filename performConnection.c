@@ -6,15 +6,14 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
-//#include <errno.h> fuer Fehlerbehandlung (Harun)
-
+#include "sharedVariables.h"
+#include <errno.h>  //fuer Fehlerbehandlung (Harun)
 
 #define BUFFR 256
-#define GAMEKINDNAME "Quarto"
-#define VERSION "VERSION 1.0"
+//#define GAMEKINDNAME "Quarto"
+//#define VERSION "VERSION 1.0"
 //Importiere Variablen
-extern char* ID;
-extern char* playerNum;
+
 
 
 //Prüfe ob der Gegenspieler im Spiel und bereit ist
@@ -69,91 +68,72 @@ int performConnection(int sock)
 {
 
     // gameID = malloc(sizeof(char)*20);
-    char* buffer = (char*) malloc(sizeof(char)*BUFFR); //Initialisiere den Buffer für die Kommunikation
+    char* buffer =  malloc(sizeof(char)*BUFFR); //Initialisiere den Buffer für die Kommunikation
     //strcpy(gameID,"ID  fm1y4PiVKfU");
     //strcpy(gameID,"ID  528902d1b0074");
 
-//Initialisiere Hilfsvariablen für die formatierte Ausgabe einer Serverantwort
+    //Initialisiere Hilfsvariablen für die formatierte Ausgabe einer Serverantwort
     char* reader;
-    char* readInt;
+    int readInt;
     reader = malloc(sizeof(char)*20);
-    readInt     = malloc(sizeof(char));
+    //readInt = malloc(sizeof(char));
     int var1;
-
-
     int err; //Return-Wert von err für Fehlerbehandlung
-   /*
 
-Im Falle eines Fehlers gilt dasselbe wie schon bei der Funktion send().
-
-Außerdem kann die Funktion recv() auch 0 zurückgeben. Dies bedeutet dann,
-
-dass der Verbindungspartner seine Verbindung beendet hat.
-
-Ansonsten wird auch mit recv() die Anzahl der erfolgreich gelesenen Bytes zurückgeliefert.
-
-*/
     err = recv(sock, buffer, BUFFR-1, 0); //Empfange Server Nachrichtung und speichere sie in Buffer
     sscanf(buffer, "%*s%*s%*s%s", reader);
     printf("\nDie Version des Servers ist: %s\n", reader);
- //printf("\n%s",buffer);
+    //printf("\n%s",buffer);
 
     if (err > 0) buffer[err]='\0'; //Markiere Ende der Übertragung mit \0
     //printf("\n%s",buffer); //Ausgabe
+    char* temp;
+    temp = malloc(sizeof(char)*(strlen("VERSION ")+10));
+    strcpy(temp,"VERSION ");
 
-    err = sendReplyFormatted(sock,VERSION);
+    strcat(temp,conf->version);
+    err = sendReplyFormatted(sock,temp);
+    free(temp);
     //send(sock,VERSION,strlen(VERSION),0); //Schicke Version des Spieles an Server
 
-    recv(sock, buffer, BUFFR-1, 0);
+    err = recv(sock, buffer, BUFFR-1, 0);
     if (err > 0) buffer[err]='\0';
     //printf("\n%s",buffer);
 
 
     if (buffer[0] == '-')
     {
-
-        printf("\nDer Server akzeptiert die Version dieses Clients nicht!\n");
+        printf("\nDer Server akzeptiert die Version %s dieses Clients nicht!\n",conf->version);
         free(buffer);
         free(reader);
-        free(readInt);
+        // free(readInt);
         close(sock);
         return EXIT_FAILURE;
     }
     else
     {
-
-        printf("\nDie Client-Version wurde akzeptiert, übertrage Spiel-ID...\n");
-
-
-
+        printf("\nDie Client-Version wurde akzeptiert, uebertrage Spiel-ID...\n");
     }
 
     err = sendReplyFormatted(sock, ID); //Schicke Spiel-ID an Server
-    //err =  send(sock,gameID,strlen(gameID),0);
-
     err = recv(sock, buffer, BUFFR-1, 0);
-
     if (err > 0) buffer[err]='\0';
     //printf("\n%s",buffer);
-
-
-
     sscanf(buffer, "%*s%*s%s", reader); //Scanne Antwort nach relevanten Variablen.
 
     if (strcmp(reader,"Quarto") !=0)   //Teste ob auch das richtige Spiel vom Server gespielt wird, falls nicht beende Verbindung
     {
         printf("Das Spiel, das der Server spielt, ist nicht Quarto! Beende Verbindung.");
         // printf("\n%s",buffer);
-
         free(buffer);
         free(reader);
-        free(readInt);
+        //  free(readInt);
         close(sock);
         return EXIT_FAILURE;
     }
     else
     {
-        printf("\nDer Server möchte %s spielen. Und wir auch!\n", reader);
+        printf("\nDer Server moechte %s spielen. Und wir auch!\n", reader);
 
     }
 
@@ -161,10 +141,8 @@ Ansonsten wird auch mit recv() die Anzahl der erfolgreich gelesenen Bytes zurüc
     err = recv(sock, buffer, BUFFR-1, 0);
     if (err > 0) buffer[err]='\0';
     printf("\nSpiel: %s",&buffer[2]); //Zeige Spielnamen an, schneide das "+" ab
-
     err = sendReplyFormatted(sock,playerNum);
     // err =  send(sock,"PLAYER\n",strlen("PLAYER\n"),0);
-
     err = recv(sock, buffer, BUFFR-1, 0);
     if (err > 0) buffer[err]='\0';
 
@@ -175,15 +153,15 @@ Ansonsten wird auch mit recv() die Anzahl der erfolgreich gelesenen Bytes zurüc
         printf("\nAlle Plaetze sind bereits belegt, versuchen sie es spaeter noch einmal!\n");
         free(buffer);
         free(reader);
-        free(readInt);
+        //free(readInt);
         close(sock);
         return EXIT_FAILURE;
     }
     else
     {
 
-        sscanf(buffer, "%*s %*s %c %s",readInt, reader);
-        printf("\nDu spielst mit dem Namen %s, deine Nummer ist %c\n", reader,*readInt);
+        sscanf(buffer, "%*s %*s %d %s",&readInt, reader);
+        printf("\nDu spielst mit dem Namen %s, deine Nummer ist %d\n", reader,readInt);
 
     }
 
@@ -192,41 +170,35 @@ Ansonsten wird auch mit recv() die Anzahl der erfolgreich gelesenen Bytes zurüc
 
 
     sscanf(buffer, "%*s %*s %i", &var1); //Scanne Anzahl der Spieler, normalerweise immer 2
-
     printf("\nEs spielen %i Spieler.", var1);
-   // printf("\n%s",buffer);
-    sscanf(buffer, "%*[^\n]%*s %c %s %i", readInt,reader,&var1); //Scanne Namen des Spielers und überprüfe ob dieser Bereit ist.
+    // printf("\n%s",buffer);
+    sscanf(buffer, "%*[^\n]%*s %d %s %i", &readInt,reader,&var1); //Scanne Namen des Spielers und überprüfe ob dieser Bereit ist.
     if (var1 == 0)
     {
-        printf("\nSpieler %s mit der Nummer %c ist noch nicht bereit.\n",reader,*readInt );
+        printf("\nSpieler %s mit der Nummer %d ist noch nicht bereit.\n",reader,readInt );
     }
     else
     {
-        printf("\nSpieler %s mit der Nummer %c ist bereit!\n",reader,*readInt );
-
+        printf("\nSpieler %s mit der Nummer %d ist bereit!\n",reader,readInt );
     }
 
 
     //WAIT <->OKWAIT Schleife, später zu implementieren.
-     /*     do
-         {
-             send(sock,"OKWAIT\n",strlen("OKWAIT\n"),0);
-             err = recv(sock, buffer, BUFFR-1, 0);
-             if (err > 0) buffer[err]='\0';
-             printf("\nServer bittet zu warten.\n");
+    /*     do
+        {
+            send(sock,"OKWAIT\n",strlen("OKWAIT\n"),0);
+            err = recv(sock, buffer, BUFFR-1, 0);
+            if (err > 0) buffer[err]='\0';
+            printf("\nServer bittet zu warten.\n");
 
-         }
-         while (strcmp(buffer,"+ WAIT\n") == 0); */
+        }
+        while (strcmp(buffer,"+ WAIT\n") == 0); */
 
-//free(ID);
     free(buffer);
     free(reader);
-    free(readInt);
+    // free(readInt);
     close(sock);
-    if (err < 0) perror("Fehler bei der Kommunikation:");
-
     return EXIT_SUCCESS;
-
 }
 
 
