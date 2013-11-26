@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <unistd.h>
+#include "sharedVariables.h"
 
 #define PORTNUMMER 1357
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
@@ -14,11 +15,11 @@
 
 char *ID; //Die modifizierte GameID die wir mit der performConnection Funktion teilen werden
 char * playerNum; // Die gewünschte Spielernummer die wir optional angeben können
-extern int performConnection(int socket);
-
+config_struct *conf; // Die Struktur, die die Konfigurationsparameter der Datei speichert
 
 int main (int argc, char** argv )
 {
+    conf = calloc(5,sizeof(config_struct));
     char *gameID;
     ID = malloc(sizeof(char)*30);
     playerNum = malloc(sizeof(char)*10);
@@ -38,44 +39,57 @@ int main (int argc, char** argv )
 
     {
         strcpy(playerNum, "PLAYER "); //Vorbereitung der Spielernummer für performConnection
-        if (argc == 3 && strlen(argv[2]) == 1)
+
+        if (argc == 3)
         {
-            strcat(playerNum,argv[2]);
+            if (openConfig(argv[2])!= 0)  //Falls Custom-config angegeben wurde
+            {
+                return EXIT_FAILURE;
+            }
 
         }
 
+        else
+        {
+            if  (openConfig("client.conf") != 0)  //Sonst Standard-config
+            {
+                return EXIT_FAILURE;
+            }
+
+        }
         strcpy(gameID,argv[1]);
         printf("Deine Game ID: %s\n",gameID);
         strcat(ID,gameID);
+
     }
 
     // Initialisiert den für die Verbindung benötigten Socket //
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in host;
     struct hostent* ip;
-    ip = (gethostbyname(HOSTNAME)); //Übersetze HOSTNAME in IP Adresse
+    ip = (gethostbyname(conf->hostname)); //Übersetze HOSTNAME in IP Adresse
     memcpy(&(host.sin_addr),ip ->h_addr,ip ->h_length);
     host.sin_family = AF_INET;
-    host.sin_port = htons(PORTNUMMER);
+    host.sin_port = htons(conf->portnumber);
 
     if (connect(sock,(struct sockaddr*)&host, sizeof(host)) == 0) //Verbinde mit Server
     {
-        printf("\nVerbindung mit %s hergestellt!\n",HOSTNAME);
+        printf("\nVerbindung mit %s hergestellt!\n",conf->hostname);
 
     }
     else
     {
 
-    printf("\n Fehler beim Verbindungsaufbau mit %s!\n", HOSTNAME); //zur besseren Fehlerbehandlung sollte
-                                                                   //printf("ERROR: %s\n", strerror(errno));
-       return EXIT_FAILURE;                                       //verwendet werden! (Harun)
+        perror("\n Fehler beim Verbindungsaufbau");
 
-   }
+        return EXIT_FAILURE;
 
-    if ((performConnection(sock)) <0 )//Führe Prolog Protokoll aus
-        perror(" Fehler:");
+    }
 
+    performConnection(sock);//Führe Prolog Protokoll aus
+    free(playerNum);
     free(gameID);
-free(ID); //Warum hier Buffer Overflow?
+    free(ID);
+    free(conf);
     return EXIT_SUCCESS;
 }
