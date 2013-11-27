@@ -14,13 +14,10 @@
 //#define VERSION "VERSION 1.0"
 //Importiere Variablen
 
-
-
 //Prüfe ob der Gegenspieler im Spiel und bereit ist
 /*
 int checkPlayerReady(char* response)
 {
-
     if(strstr(response,"0") !=NULL)
     {
         printf("\nDein Gegner ist noch nicht bereit, bitte warte ein wenig.\n");
@@ -30,9 +27,7 @@ int checkPlayerReady(char* response)
     {
         printf("\nDein Gegenspieler ist bereit");
         return 0;
-
     }
-
 }
 void testBuffer(char* buffer, int size)
 {
@@ -42,10 +37,7 @@ void testBuffer(char* buffer, int size)
         if (buffer[i] == '\n') printf(" \\n ");
         else
             printf(" %c ",buffer[i]);
-
     }
-
-
 }
 */
 //Bringe die zu sendende Antwort in ein für den Server angepasstes Format.
@@ -59,7 +51,6 @@ int sendReplyFormatted(int sock, char* reply)
     err = send(sock,container,strlen(container),0); //Sende den Container an den Server, err für Fehlerbehandlung.
     free(container);
     return err;
-
 }
 
 
@@ -100,7 +91,6 @@ int performConnection(int sock)
     if (err > 0) buffer[err]='\0';
     //printf("\n%s",buffer);
 
-
     if (buffer[0] == '-')
     {
         printf("\nDer Server akzeptiert die Version %s dieses Clients nicht!\n",conf->version);
@@ -134,7 +124,6 @@ int performConnection(int sock)
     else
     {
         printf("\nDer Server moechte %s spielen. Und wir auch!\n", reader);
-
     }
 
 //Schicke Spieler Konfiguration und lese Nachrichten vom Server
@@ -149,7 +138,6 @@ int performConnection(int sock)
 //Teste ob überhaupt noch was frei ist, falls ja gebe Name des Spielers und Nummer aus, falls nicht beende Übertragung
     if (buffer[0] == '-')
     {
-
         printf("\nAlle Plaetze sind bereits belegt, versuchen sie es spaeter noch einmal!\n");
         free(buffer);
         free(reader);
@@ -159,15 +147,12 @@ int performConnection(int sock)
     }
     else
     {
-
         sscanf(buffer, "%*s %*s %d %s",&readInt, reader);
         printf("\nDu spielst mit dem Namen %s, deine Nummer ist %d\n", reader,readInt);
-
     }
 
     err = recv(sock, buffer, BUFFR-1, 0);
     if (err > 0) buffer[err]='\0';
-
 
     sscanf(buffer, "%*s %*s %i", &var1); //Scanne Anzahl der Spieler, normalerweise immer 2
     printf("\nEs spielen %i Spieler.", var1);
@@ -181,7 +166,6 @@ int performConnection(int sock)
     {
         printf("\nSpieler %s mit der Nummer %d ist bereit!\n",reader,readInt );
     }
-
 
     //WAIT <->OKWAIT Schleife, später zu implementieren.
     /*     do
