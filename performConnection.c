@@ -7,48 +7,48 @@
 #include <netdb.h>
 #include <unistd.h>
 #include "sharedVariables.h"
-#include <errno.h>  //fuer Fehlerbehandlung (Harun)
+#include <errno.h> //fuer Fehlerbehandlung (Harun)
 
 #define BUFFR 256
 //#define GAMEKINDNAME "Quarto"
 //#define VERSION "VERSION 1.0"
 //Importiere Variablen
 
-//Prüfe ob der Gegenspieler im Spiel und bereit ist
+//Pruefe ob der Gegenspieler im Spiel und bereit ist
 /*
 int checkPlayerReady(char* response)
 {
-    if(strstr(response,"0") !=NULL)
-    {
-        printf("\nDein Gegner ist noch nicht bereit, bitte warte ein wenig.\n");
-        return 1;
-    }
-    else
-    {
-        printf("\nDein Gegenspieler ist bereit");
-        return 0;
-    }
+if(strstr(response,"0") !=NULL)
+{
+printf("\nDein Gegner ist noch nicht bereit, bitte warte ein wenig.\n");
+return 1;
+}
+else
+{
+printf("\nDein Gegenspieler ist bereit");
+return 0;
+}
 }
 void testBuffer(char* buffer, int size)
 {
-    int i;
-    for (i=0; i<size; i++)
-    {
-        if (buffer[i] == '\n') printf(" \\n ");
-        else
-            printf(" %c ",buffer[i]);
-    }
+int i;
+for (i=0; i<size; i++)
+{
+if (buffer[i] == '\n') printf(" \\n ");
+else
+printf(" %c ",buffer[i]);
+}
 }
 */
-//Bringe die zu sendende Antwort in ein für den Server angepasstes Format.
+//Bringe die zu sendende Antwort in ein fuer den Server angepasstes Format.
 int sendReplyFormatted(int sock, char* reply)
 {
     char * container;
-    container = malloc(sizeof(char)*strlen(reply)*2); // Container-String der die Antwort übernimmt und eine Newline angehängt bekommt.
+    container = malloc(sizeof(char)*strlen(reply)*2); // Container-String der die Antwort uebernimmt und eine Newline angehaengt bekommt.
     int err;
     strcpy(container,reply);
     strcat(container, "\n");
-    err = send(sock,container,strlen(container),0); //Sende den Container an den Server, err für Fehlerbehandlung.
+    err = send(sock,container,strlen(container),0); //Sende den Container an den Server, err fuer Fehlerbehandlung.
     free(container);
     return err;
 }
@@ -59,24 +59,24 @@ int performConnection(int sock)
 {
 
     // gameID = malloc(sizeof(char)*20);
-    char* buffer =  malloc(sizeof(char)*BUFFR); //Initialisiere den Buffer für die Kommunikation
-    //strcpy(gameID,"ID  fm1y4PiVKfU");
-    //strcpy(gameID,"ID  528902d1b0074");
+    char* buffer = malloc(sizeof(char)*BUFFR); //Initialisiere den Buffer fuer die Kommunikation
+    //strcpy(gameID,"ID fm1y4PiVKfU");
+    //strcpy(gameID,"ID 528902d1b0074");
 
-    //Initialisiere Hilfsvariablen für die formatierte Ausgabe einer Serverantwort
+    //Initialisiere Hilfsvariablen fuer die formatierte Ausgabe einer Serverantwort
     char* reader;
     int readInt;
     reader = malloc(sizeof(char)*20);
     //readInt = malloc(sizeof(char));
     int var1;
-    int err; //Return-Wert von err für Fehlerbehandlung
+    int err; //Return-Wert von err fuer Fehlerbehandlung
 
     err = recv(sock, buffer, BUFFR-1, 0); //Empfange Server Nachrichtung und speichere sie in Buffer
     sscanf(buffer, "%*s%*s%*s%s", reader);
     printf("\nDie Version des Servers ist: %s\n", reader);
     //printf("\n%s",buffer);
 
-    if (err > 0) buffer[err]='\0'; //Markiere Ende der Übertragung mit \0
+    if (err > 0) buffer[err]='\0'; //Markiere Ende der uebertragung mit \0
     //printf("\n%s",buffer); //Ausgabe
     char* temp;
     temp = malloc(sizeof(char)*(strlen("VERSION ")+10));
@@ -111,13 +111,13 @@ int performConnection(int sock)
     //printf("\n%s",buffer);
     sscanf(buffer, "%*s%*s%s", reader); //Scanne Antwort nach relevanten Variablen.
 
-    if (strcmp(reader,"Quarto") !=0)   //Teste ob auch das richtige Spiel vom Server gespielt wird, falls nicht beende Verbindung
+    if (strcmp(reader,"Quarto") !=0) //Teste ob auch das richtige Spiel vom Server gespielt wird, falls nicht beende Verbindung
     {
         printf("Das Spiel, das der Server spielt, ist nicht Quarto! Beende Verbindung.");
         // printf("\n%s",buffer);
         free(buffer);
         free(reader);
-        //  free(readInt);
+        // free(readInt);
         close(sock);
         return EXIT_FAILURE;
     }
@@ -131,11 +131,11 @@ int performConnection(int sock)
     if (err > 0) buffer[err]='\0';
     printf("\nSpiel: %s",&buffer[2]); //Zeige Spielnamen an, schneide das "+" ab
     err = sendReplyFormatted(sock,playerNum);
-    // err =  send(sock,"PLAYER\n",strlen("PLAYER\n"),0);
+    // err = send(sock,"PLAYER\n",strlen("PLAYER\n"),0);
     err = recv(sock, buffer, BUFFR-1, 0);
     if (err > 0) buffer[err]='\0';
 
-//Teste ob überhaupt noch was frei ist, falls ja gebe Name des Spielers und Nummer aus, falls nicht beende Übertragung
+//Teste ob ueberhaupt noch was frei ist, falls ja gebe Name des Spielers und Nummer aus, falls nicht beende uebertragung
     if (buffer[0] == '-')
     {
         printf("\nAlle Plaetze sind bereits belegt, versuchen sie es spaeter noch einmal!\n");
@@ -157,7 +157,7 @@ int performConnection(int sock)
     sscanf(buffer, "%*s %*s %i", &var1); //Scanne Anzahl der Spieler, normalerweise immer 2
     printf("\nEs spielen %i Spieler.", var1);
     // printf("\n%s",buffer);
-    sscanf(buffer, "%*[^\n]%*s %d %s %i", &readInt,reader,&var1); //Scanne Namen des Spielers und überprüfe ob dieser Bereit ist.
+    sscanf(buffer, "%*[^\n]%*s %d %s %i", &readInt,reader,&var1); //Scanne Namen des Spielers und ueberpruefe ob dieser Bereit ist.
     if (var1 == 0)
     {
         printf("\nSpieler %s mit der Nummer %d ist noch nicht bereit.\n",reader,readInt );
@@ -167,16 +167,16 @@ int performConnection(int sock)
         printf("\nSpieler %s mit der Nummer %d ist bereit!\n",reader,readInt );
     }
 
-    //WAIT <->OKWAIT Schleife, später zu implementieren.
-    /*     do
-        {
-            send(sock,"OKWAIT\n",strlen("OKWAIT\n"),0);
-            err = recv(sock, buffer, BUFFR-1, 0);
-            if (err > 0) buffer[err]='\0';
-            printf("\nServer bittet zu warten.\n");
+    //WAIT <->OKWAIT Schleife, spaeter zu implementieren.
+    /* do
+{
+send(sock,"OKWAIT\n",strlen("OKWAIT\n"),0);
+err = recv(sock, buffer, BUFFR-1, 0);
+if (err > 0) buffer[err]='\0';
+printf("\nServer bittet zu warten.\n");
 
-        }
-        while (strcmp(buffer,"+ WAIT\n") == 0); */
+}
+while (strcmp(buffer,"+ WAIT\n") == 0); */
 
     free(buffer);
     free(reader);
@@ -184,7 +184,3 @@ int performConnection(int sock)
     close(sock);
     return EXIT_SUCCESS;
 }
-
-
-
-
