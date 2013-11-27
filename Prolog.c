@@ -11,8 +11,6 @@
 #define PORTNUMMER 1357
 #define HOSTNAME "sysprak.priv.lab.nm.ifi.lmu.de"
 
-
-
 char *ID; //Die modifizierte GameID die wir mit der performConnection Funktion teilen werden
 char * playerNum; // Die gewünschte Spielernummer die wir optional angeben können
 config_struct *conf; // Die Struktur, die die Konfigurationsparameter der Datei speichert
@@ -36,7 +34,6 @@ int main (int argc, char** argv )
         return EXIT_FAILURE;
     }
     else
-
     {
         strcpy(playerNum, "PLAYER "); //Vorbereitung der Spielernummer für performConnection
 
@@ -46,21 +43,17 @@ int main (int argc, char** argv )
             {
                 return EXIT_FAILURE;
             }
-
         }
-
         else
         {
             if  (openConfig("client.conf") != 0)  //Sonst Standard-config
             {
                 return EXIT_FAILURE;
             }
-
         }
         strcpy(gameID,argv[1]);
         printf("Deine Game ID: %s\n",gameID);
         strcat(ID,gameID);
-
     }
 
     // Initialisiert den für die Verbindung benötigten Socket //
@@ -75,15 +68,11 @@ int main (int argc, char** argv )
     if (connect(sock,(struct sockaddr*)&host, sizeof(host)) == 0) //Verbinde mit Server
     {
         printf("\nVerbindung mit %s hergestellt!\n",conf->hostname);
-
     }
     else
     {
-
         perror("\n Fehler beim Verbindungsaufbau");
-
         return EXIT_FAILURE;
-
     }
 
     performConnection(sock);//Führe Prolog Protokoll aus
