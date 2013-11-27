@@ -4,37 +4,29 @@
 #include "sharedVariables.h"
 /* Funktion, die unsere Konfigdatei ausliest und Werte der Struktur zuweist */
 
-
-
-
 //Prüfe Parametername
 int checkName(char* name, char* wert)
 {
-
     if (strcmp(name,"Hostname") == 0)
     {
         memcpy(conf->hostname,wert,strlen(wert));
         return EXIT_SUCCESS;
-
     }
     else if (strcmp(name,"Version") == 0)
     {
         memcpy(conf->version,wert,strlen(wert));
         return EXIT_SUCCESS;
     }
-
     else if (strcmp(name,"Spieltyp") == 0)
     {
         memcpy(conf->gamekindname,wert,strlen(wert));
         return EXIT_SUCCESS;
     }
-
     else if (strcmp(name,"Portnummer") == 0)
     {
         conf->portnumber =  strtol(wert,(char**) NULL, 10);
         return EXIT_SUCCESS;
     }
-
     else if (strcmp(name,"Spielernummer") == 0)
     {
         memcpy(conf->playernumber,wert,strlen(wert));
@@ -45,7 +37,6 @@ int checkName(char* name, char* wert)
         printf("Parameter nicht gefunden, bitte prüfen ob die Konfigurationsdatei korrekt ist!\n");
         return EXIT_FAILURE;
     }
-
 }
 
 //Standarprozedur um Datei zu öffnen
@@ -66,17 +57,12 @@ FILE* openFile(char* name)
     }
     if ((file=fopen(fileName,"r")) == NULL)
     {
-
         perror("Datei konnte nicht geöffnet werden");
         return file;
-
     }
     free(fileName);
     return file;
-
 }
-
-
 
 int readConfig(FILE* configFile)
 {
